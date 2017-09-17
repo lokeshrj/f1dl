@@ -1,0 +1,24 @@
+{
+  "name": "f1dl",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lokeshrj/f1dl.git"
+  },
+  "author": "Lokesh J",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lokeshrj/f1dl/issues"
+  },
+  "homepage": "https://github.com/lokeshrj/f1dl#readme",
+  "dependencies": {
+    "jsdom": "^11.0.0",
+    "request": "^2.81.0"
+  }
+}
