@@ -3,9 +3,9 @@ const chalk = require('chalk');
 const fs = require('fs')
 const request = require('request')
 
-var listings = [];
-const url = 'https://www.demonoid.pw/files/?uid=9412950';
-const interval = 15 * 60 * 1000;
+let listings = [];
+const url = 'https://www.demonoid.is/files/?uid=15328&seeded=2';
+const interval = 10 * 60 * 1000;
 
 init();
 setInterval(checkAndDownload, interval);
@@ -17,10 +17,11 @@ function init() {
 }
 
 const extractData = node => {
-  if(node.firstChild.textContent.indexOf('Formula') > -1 && node.firstChild.textContent.indexOf('1080') > -1) {
-    var entry = {
-      label: node.firstChild.text,
-      url: node.firstChild.href.replace('details','download')  
+  const { textContent, href } = node.children[0];
+  if(textContent.includes('Formula') && textContent.includes('HD')) {
+    const entry = {
+      label: textContent,
+      url: href.replace('details','download')  
     }
     return entry;
   }
@@ -30,21 +31,14 @@ function checkAndDownload() {
   console.log(chalk.dim('Checking for new episode at ', new Date()));
   JSDOM.fromURL(url)
   .then(dom => {
-    var results = [];
-    var evenNodes = dom.window.document.querySelectorAll('.tone_1_pad');
-    var oddNodes = dom.window.document.querySelectorAll('.tone_3_pad');
+    const nodes = [...dom.window.document.querySelectorAll('.tone_1_pad'), ...dom.window.document.querySelectorAll('.tone_3_pad')];
     
-    evenNodes.forEach(node => {
-        var entry = extractData(node);
+    const results = [];
+    nodes.forEach(node => {
+        const entry = extractData(node);
         if(entry) {
           results.push(entry);
         }
-    });
-    oddNodes.forEach(node => {
-      var entry = extractData(node);
-      if(entry) {
-        results.push(entry);
-      }
     });
     
     if(listings.length > 0) {
@@ -52,13 +46,14 @@ function checkAndDownload() {
         if(!listings.some(listing => {
           return listing.label.indexOf(result.label) > -1
         })) {
+          console.log(chalk.bold.redBright.bgGreen('Found new episode ', result.label, ' at ', new Date()));
           downloadFile(result.label, result.url);
-          console.log(chalk.bold.redBright.bgGreen('Starting download of new episode ', result.label, ' at ', new Date()));
         }
       });
     } 
     listings = results;
-  })
+  });
+  
 }
 
 const downloadFile = (name, url) => {
